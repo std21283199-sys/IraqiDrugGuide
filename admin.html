@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم الشاملة والمراقبة ⚙️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #080f1d;
+            --bg-card: rgba(22, 34, 63, 0.7);
+            --gold-primary: #c5a86a;
+            --text-light: #ffffff;
+            --text-muted: #8fa0c0;
+        }
+        * { box-sizing: border-box; font-family: 'Cairo', sans-serif; margin: 0; padding: 0; }
+        
+        body { 
+            background-color: var(--bg-dark); color: var(--text-light); padding: 20px; padding-bottom: 100px; position: relative; overflow-x: hidden;
+        }
+        body::before {
+            content: ""; position: fixed; top: -50%; left: -50%; right: -50%; bottom: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(197, 168, 106, 0.15) 1.5px, transparent 1.5px) 0 0, radial-gradient(circle, rgba(85, 135, 231, 0.12) 2.5px, transparent 2.5px) 40px 40px;
+            background-size: 120px 120px; animation: spaceMove 35s linear infinite; z-index: -1; pointer-events: none;
+        }
+        @keyframes spaceMove {
+            0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); }
+        }
+        
+        .login-container {
+            max-width: 400px; margin: 60px auto; background: rgba(22, 34, 63, 0.75); backdrop-filter: blur(10px);
+            padding: 30px 20px; border-radius: 20px; border: 1px solid rgba(197, 168, 106, 0.25); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .login-container h2 { color: var(--gold-primary); margin-bottom: 20px; }
+        .login-container input {
+            width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 1px solid rgba(197, 168, 106, 0.3); background: rgba(16, 28, 55, 0.8); color: white; text-align: right; outline: none;
+        }
+        .admin-dashboard { display: none; max-width: 600px; margin: 0 auto; }
+        .admin-dashboard.active { display: block; }
+        .stats-panel { background: rgba(16, 28, 55, 0.8); backdrop-filter: blur(8px); padding: 20px; border-radius: 18px; border: 1px solid var(--gold-primary); text-align: center; margin-bottom: 25px; }
+        .stats-count { font-size: 2.5rem; font-weight: 700; color: var(--gold-primary); }
+        .all-names-box { background: rgba(17, 26, 48, 0.75); border-radius: 15px; padding: 15px; margin-bottom: 25px; max-height: 200px; overflow-y: auto; border: 1px solid rgba(197,168,106,0.2); }
+        .drug-name-badge { display: inline-block; background: rgba(22, 34, 63, 0.8); padding: 4px 10px; border-radius: 8px; margin: 4px; font-size: 0.8rem; cursor: pointer; border: 1px solid rgba(197,168,106,0.15); }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; color: var(--gold-primary); margin-bottom: 5px; font-size: 0.9rem; }
+        .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 12px; background: var(--bg-card); border: 1px solid rgba(197, 168, 106, 0.25); border-radius: 12px; color: white; text-align: right; outline: none; }
+        
+        .category-creation-box { display: flex; gap: 8px; margin-top: 8px; }
+        .category-creation-box input { flex: 1; padding: 10px; background: rgba(16, 28, 55, 0.6); border: 1px solid rgba(197, 168, 106, 0.2); border-radius: 8px; color: white; }
+        .add-cat-btn { background: #22c55e; color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        .action-btn { width: 100%; background: linear-gradient(135deg, var(--gold-primary), #9a7d43); color: #0d1527; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
+        .logout-btn { background: #e04f5f; color: white; }
+        .admin-drug-card { background: var(--bg-card); padding: 15px; border-radius: 15px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(197,168,106,0.2); }
+        .admin-drug-info { display: flex; align-items: center; gap: 12px; }
+        .btn-group { display: flex; gap: 8px; }
+        .edit-btn { background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; }
+        .delete-btn { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #09101f; border-top: 2px solid rgba(197, 168, 106, 0.25); display: flex; justify-content: space-around; align-items: center; z-index: 9999; }
+        .nav-item { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; display: flex; flex-direction: column; align-items: center; }
+        .nav-item.active { color: var(--gold-primary); }
+    </style>
+</head>
+<body>
+
+    <div class="login-container" id="loginSection">
+        <h2>🔐 تسجيل دخول الأدمن</h2>
+        <input type="text" id="adminEmail" placeholder="اسم مستخدم الأدمن">
+        <input type="password" id="adminPassword" placeholder="كلمة المرور السريّة">
+        <button class="action-btn" onclick="handleAdminLogin()">تسجيل الدخول الملكي 👑</button>
+    </div>
+
+    <div class="admin-dashboard" id="adminDashboardSection">
+        <div class="stats-panel">
+            <span class="stats-count" id="totalDrugsCounter">0</span><br>
+            <span class="stats-label">علاجاً مسجلاً في الدليل حالياً 📊</span>
+        </div>
+
+        <div class="all-names-box">
+            <h4>📋 الفهرس السريع للأدوية:</h4>
+            <div id="allDrugNamesContainer"></div>
+        </div>
+
+        <h2 style="color: var(--gold-primary); margin-bottom: 20px;">👑 إضافة أو تحديث دواء</h2>
+        <input type="hidden" id="editingDrugId" value="">
+
+        <div class="input-group">
+    <label>اسم الدواء التجاري (مثل: Nexium)</label>
+    <input type="text" id="drugName" placeholder="أدخل اسم الدواء...">
+</div>
+
+<div class="input-group">
+    <label>المادة العلمية</label>
+    <input type="text" id="drugScientific" placeholder="أدخل المادة العلمية...">
+</div>
+
+<div class="input-group">
+    <label>الشركة المصنعة</label>
+    <input type="text" id="drugCompany" placeholder="اسم الشركة...">
+</div>
+
+<div class="input-group">
+    <label>الجرعة / القوة</label>
+    <input type="text" id="drugStrength" placeholder="أدخل القوة (مثال: 40mg)...">
+</div>
+        
+        <div class="input-group">
+            <label>القسم الطبي الحالي (يمكنك النقل بينها عند التعديل)</label>
+            <select id="drugCategory">
+                <option value="الجهاز الهضمي">الجهاز الهضمي</option>
+                <option value="الجهاز التنفسي">الجهاز التنفسي</option>
+                <option value="الجهاز العصبي">الجهاز العصبي</option>
+                <option value="القلب والأوعية">القلب والأوعية</option>
+                <option value="المضادات الحيوية">المضادات الحيوية</option>
+                <option value="المسكنات والحرارة">المسكنات والحرارة</option>
+            </select>
+            <div class="category-creation-box">
+                <input type="text" id="newCategoryInput" placeholder="أضف قسماً طبياً جديداً هنا...">
+                <button type="button" class="add-cat-btn" onclick="addNewCategoryToList()">+ إضافة</button>
+            </div>
+        </div>
+<div class="input-group">
+    <label>رابط صورة الدواء</label>
+    <input type="text" id="drugImage" placeholder="ضع رابط الصورة هنا إذا وجد...">
+</div>
+
+<div class="input-group">
+    <label>🧪 المكونات والتركيبة</label>
+    <textarea id="drugIngredients" placeholder="أدخل المكونات والتركيبة..."></textarea>
+</div>
+
+<div class="input-group">
+    <label>📝 الاستخدامات والشرح</label>
+    <textarea id="drugDescription" placeholder="أدخل الاستخدامات والشرح..."></textarea>
+</div>
+
+<div class="input-group">
+    <label>⚠️ الآثار الجانبية</label>
+    <textarea id="drugSideEffects" placeholder="أدخل الآثار الجانبية..."></textarea>
+</div>
+
+<div class="input-group">
+    <label>🚫 موانع الاستعمال</label>
+    <textarea id="drugWarnings" placeholder="أدخل موانع الاستعمال..."></textarea>
+</div>
+        
+        <button class="action-btn" id="saveDrugBtn">حفظ وإضافة الدواء لقاعدة البيانات 💾</button>
+        <button class="action-btn logout-btn" onclick="handleAdminLogout()">تسجيل الخروج الآمن 🚪</button>
+
+        <div class="manage-section">
+    <h3 class="manage-title">📊 إدارة وحذف الأدوية:</h3>
+
+    <input
+        type="text"
+        id="adminSearch"
+        placeholder="🔍 ابحث عن دواء..."
+        onkeyup="filterAdminDrugs()"
+        style="
+            width:100%;
+            padding:14px;
+            margin:15px 0;
+            border-radius:12px;
+            border:none;
+            outline:none;
+            background:#1b2647;
+            color:white;
+            font-size:16px;
+        ">
+
+    <div id="adminDrugsContainer"></div>
+</div>
+
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item"><div>🏠</div><span>الرئيسية</span></a>
+        <a href="admin.html" class="nav-item active"><div>⚙️</div><span>لوحة الأدمن</span></a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyBHWCrFDsuMLxbKmFMQPbMJGBtohzeqqUk",
+          authDomain: "iraqi-drug-guide-38aa5.firebaseapp.com",
+          projectId: "iraqi-drug-guide-38aa5",
+          storageBucket: "iraqi-drug-guide-38aa5.firebasestorage.app",
+          messagingSenderId: "457879362257",
+          appId: "1:457879362257:web:5e7b517acd09dc0d2203f0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        let localAdminDrugs = [];
+
+        // 🛡️ دالة التحقق من جلسة السيشن عند تشغيل الصفحة فوراً
+        function checkSession() {
+            if (sessionStorage.getItem("adminAuthSuccess") === "true") {
+                document.getElementById("loginSection").style.display = "none";
+                document.getElementById("adminDashboardSection").classList.add("active");
+                loadAdminDrugsList();
+            }
+        }
+
+        window.handleAdminLogin = function() {
+            const email = document.getElementById("adminEmail").value.trim().toLowerCase();
+            const password = document.getElementById("adminPassword").value.trim();
+            if (email === "ibra" && password === "6024758359") {
+                // حفظ الجلسة بنجاح
+                sessionStorage.setItem("adminAuthSuccess", "true");
+                document.getElementById("loginSection").style.display = "none";
+                document.getElementById("adminDashboardSection").classList.add("active");
+                loadAdminDrugsList();
+            } else {
+                alert("❌ اسم المستخدم أو رمز المرور خطأ!");
+            }
+        }
+
+        window.handleAdminLogout = function() { 
+            sessionStorage.removeItem("adminAuthSuccess");
+            window.location.href = "index.html"; 
+        }
+
+        window.addNewCategoryToList = function() {
+            const input = document.getElementById("newCategoryInput");
+            const catName = input.value.trim();
+            if(!catName) return alert("يرجى كتابة اسم القسم أولاً!");
+            const select = document.getElementById("drugCategory");
+            for (let i = 0; i < select.options.length; i++) {
+                if (select.options[i].value === catName) return alert("هذا القسم موجود بالفعل!");
+            }
+            const newOption = document.createElement("option");
+            newOption.value = catName; newOption.text = catName;
+            select.add(newOption); select.value = catName; input.value = "";
+        }
+
+        async function loadAdminDrugsList() {
+            const container = document.getElementById("adminDrugsContainer");
+            const namesContainer = document.getElementById("allDrugNamesContainer");
+            container.innerHTML = "جاري التحميل..."; namesContainer.innerHTML = "";
+            try {
+                const querySnapshot = await getDocs(collection(db, "drugs"));
+                localAdminDrugs = []; container.innerHTML = "";
+                querySnapshot.forEach((doc) => { localAdminDrugs.push({ id: doc.id, ...doc.data() }); });
+                document.getElementById("totalDrugsCounter").innerText = localAdminDrugs.length;
+                
+                const select = document.getElementById("drugCategory");
+                localAdminDrugs.forEach(drug => {
+                    if(drug.category) {
+                        let exists = false;
+                        for (let i = 0; i < select.options.length; i++) {
+                            if (select.options[i].value === drug.category) exists = true;
+                        }
+                        if(!exists) {
+                            const opt = document.createElement("option");
+                            opt.value = drug.category; opt.text = drug.category; select.add(opt);
+                        }
+                    }
+                });
+
+                localAdminDrugs.forEach((drug) => {
+                    const badge = document.createElement("span"); badge.className = "drug-name-badge";
+                    badge.innerHTML = `${drug.name}`; badge.onclick = () => prepareEditDrug(drug.id);
+                    namesContainer.appendChild(badge);
+
+                    const card = document.createElement("div"); card.className = "admin-drug-card";
+                    card.innerHTML = `
+                        <div class="admin-drug-info">
+                            <div>
+                                <strong>${drug.name}</strong> 
+                                <span style="font-size:0.75rem; background:rgba(197,168,106,0.2); padding:2px 6px; border-radius:5px; margin-right:5px; color:#e5cd96;">${drug.category || 'غير مصنف'}</span>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="edit-btn" onclick="prepareEditDrug('${drug.id}')">تعديل</button>
+                            <button class="delete-btn" onclick="handleDeleteDrug('${drug.id}')">حذف</button>
+                        </div>`;
+                    container.appendChild(card);
+                });
+            } catch(e) { container.innerHTML = "خطأ في جلب البيانات."; }
+        }
+
+        window.prepareEditDrug = function(id) {
+            const drug = localAdminDrugs.find(d => d.id === id);
+            if(drug) {
+                document.getElementById("editingDrugId").value = drug.id;
+                document.getElementById("drugName").value = drug.name || "";
+                document.getElementById("drugScientific").value = drug.scientific || "";
+                document.getElementById("drugCompany").value = drug.company || "";
+                document.getElementById("drugStrength").value = drug.strength || "";
+                
+                const select = document.getElementById("drugCategory");
+                let exists = false;
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value === drug.category) exists = true;
+                }
+                if(!exists && drug.category) {
+                    const opt = document.createElement("option");
+                    opt.value = drug.category; opt.text = drug.category; select.add(opt);
+                }
+                
+                select.value = drug.category || "الجهاز الهضمي";
+                document.getElementById("drugImage").value = drug.image || "";
+                document.getElementById("drugIngredients").value = drug.ingredients || "";
+                document.getElementById("drugDescription").value = drug.description || "";
+                document.getElementById("drugSideEffects").value = drug.sideEffects || "";
+                document.getElementById("drugWarnings").value = drug.warnings || "";
+                document.getElementById("saveDrugBtn").innerText = "تحديث ونقل الدواء للقسم المحدد 💾";
+                window.scrollTo({ top: 300, behavior: 'smooth' });
+            }
+        }
+
+        window.handleDeleteDrug = async function(id) {
+            if(confirm("هل أنت متأكد من الحذف؟")) {
+                await deleteDoc(doc(db, "drugs", id)); loadAdminDrugsList();
+            }
+        }
+
+        document.getElementById("saveDrugBtn").addEventListener("click", async () => {
+            const id = document.getElementById("editingDrugId").value;
+            const name = document.getElementById("drugName").value.trim();
+            if(!name) return alert("أدخل اسم الدواء!");
+            
+            const drugData = {
+                name, scientific: document.getElementById("drugScientific").value.trim(),
+                company: document.getElementById("drugCompany").value.trim(), strength: document.getElementById("drugStrength").value.trim(),
+                category: document.getElementById("drugCategory").value, image: document.getElementById("drugImage").value.trim(),
+                ingredients: document.getElementById("drugIngredients").value.trim(), description: document.getElementById("drugDescription").value.trim(),
+                sideEffects: document.getElementById("drugSideEffects").value.trim(), warnings: document.getElementById("drugWarnings").value.trim()
+            };
+
+            if(id) { await updateDoc(doc(db, "drugs", id), drugData); alert("تم التعديل والنقل بنجاح!"); } 
+            else { await addDoc(collection(db, "drugs"), drugData); alert("تم الإضافة بنجاح!"); }
+            
+            location.reload();
+        });
+
+        // تشغيل فحص الجلسة فور تحميل الصفحة
+        checkSession();
+        window.filterAdminDrugs = function () {
+
+    const value = document.getElementById("adminSearch").value.toLowerCase();
+    const container = document.getElementById("adminDrugsContainer");
+
+    container.innerHTML = "";
+
+    localAdminDrugs
+        .filter(drug =>
+            (drug.name || "").toLowerCase().includes(value) ||
+            (drug.scientific || "").toLowerCase().includes(value) ||
+            (drug.category || "").toLowerCase().includes(value)
+        )
+        .forEach(drug => {
+
+            const card = document.createElement("div");
+            card.className = "admin-drug-card";
+
+            card.innerHTML = `
+                <div class="admin-drug-info">
+                    <div>
+                        <strong>${drug.name}</strong>
+                        <span style="font-size:0.75rem;background:rgba(197,168,106,.2);padding:2px 6px;border-radius:5px;margin-right:5px;color:#e5cd96;">
+                            ${drug.category || 'غير مصنف'}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="edit-btn" onclick="prepareEditDrug('${drug.id}')">تعديل</button>
+                    <button class="delete-btn" onclick="handleDeleteDrug('${drug.id}')">حذف</button>
+                </div>
+            `;
+
+            container.appendChild(card);
+        });
+
+};
+    </script>
+</body>
+</html>

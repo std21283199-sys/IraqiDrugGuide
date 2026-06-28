@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">IBRA</string>
+    <string name="title_activity_main">IBRA</string>
+    <string name="package_name">COM.IBRAHIM</string>
+    <string name="custom_url_scheme">COM.IBRAHIM</string>
+</resources>

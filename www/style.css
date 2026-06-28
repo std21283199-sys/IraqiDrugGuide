@@ -1,0 +1,88 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f4f7fb;
+color:#222;
+}
+
+header{
+background:linear-gradient(135deg,#0f6fff,#00c6ff);
+color:white;
+padding:25px;
+text-align:center;
+border-bottom-left-radius:25px;
+border-bottom-right-radius:25px;
+box-shadow:0 5px 15px rgba(0,0,0,.15);
+}
+
+header h1{
+font-size:28px;
+margin-bottom:8px;
+}
+
+header p{
+opacity:.9;
+font-size:15px;
+}
+
+.search-box{
+padding:20px;
+}
+
+.search-box input{
+width:100%;
+padding:15px;
+border:none;
+border-radius:15px;
+font-size:17px;
+outline:none;
+background:white;
+box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+.drug-list{
+padding:15px;
+display:flex;
+flex-direction:column;
+gap:15px;
+}
+
+.drug-card{
+display:flex;
+align-items:center;
+gap:15px;
+background:white;
+padding:15px;
+border-radius:18px;
+box-shadow:0 5px 15px rgba(0,0,0,.08);
+cursor:pointer;
+transition:.25s;
+}
+
+.drug-card:hover{
+transform:scale(1.02);
+}
+
+.drug-card img{
+width:80px;
+height:80px;
+object-fit:contain;
+border-radius:12px;
+background:#fafafa;
+padding:5px;
+}
+
+.drug-card h2{
+font-size:20px;
+margin-bottom:5px;
+}
+
+.drug-card p{
+color:#666;
+font-size:14px;
+}

@@ -1,0 +1,28 @@
+[
+  {
+    "id": 1,
+    "name": "Panadol",
+    "scientific": "Paracetamol",
+    "strength": "500mg",
+    "price": "2500 IQD",
+    "company": "GSK",
+    "image": "images/panadol.jpg",
+    "uses": "مسكن للألم وخافض للحرارة",
+    "dose": "حبة كل 6 ساعات عند الحاجة",
+    "sideEffects": "غثيان، طفح جلدي",
+    "warnings": "لا تتجاوز الجرعة اليومية"
+  },
+  {
+    "id": 2,
+    "name": "Brufen",
+    "scientific": "Ibuprofen",
+    "strength": "400mg",
+    "price": "3000 IQD",
+    "company": "Abbott",
+    "image": "images/brufen.jpg",
+    "uses": "مسكن ومضاد التهاب",
+    "dose": "حبة بعد الأكل",
+    "sideEffects": "حرقة المعدة",
+    "warnings": "يمنع لمرضى قرحة المعدة"
+  }
+]
